@@ -17,30 +17,38 @@ function getMonthName(month: number) {
   ][month - 1];
 }
 
+async function fetchAndParsePDF(date: Date) {
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const monthStr = month.toString().padStart(2, "0");
+  const dayStr = day.toString().padStart(2, "0");
+  const monthName = getMonthName(month);
+  const pdfUrl = `https://www.da.gov.ph/wp-content/uploads/${year}/${monthStr}/Daily-Price-Index-${monthName}-${day}-${year}.pdf`;
+
+  const response = await fetch(pdfUrl);
+  if (!response.ok) {
+    throw new Error("Failed to fetch the PDF file.");
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  const pdfData = await pdf(Buffer.from(arrayBuffer));
+  return pdfData.text;
+}
+
 export const priceService = {
   getPrices: async () => {
     try {
       // Always use today's date
-      const targetDate = new Date();
-      const year = targetDate.getFullYear();
-      const month = targetDate.getMonth() + 1; // JS months are 0-based
-      const day = targetDate.getDate();
-
-      // Format month and day as two digits
-      const monthStr = month.toString().padStart(2, "0");
-      const dayStr = day.toString().padStart(2, "0");
-      const monthName = getMonthName(month);
-
-      // Build PDF URL
-      const pdfUrl = `https://www.da.gov.ph/wp-content/uploads/${year}/${monthStr}/Daily-Price-Index-${monthName}-${day}-${year}.pdf`;
-
-      const response = await fetch(pdfUrl);
-      if (!response.ok) {
-        throw new Error("Failed to fetch the PDF file.");
+      const today = new Date();
+      let text: string;
+      try {
+        text = await fetchAndParsePDF(today);
+      } catch (error) {
+        // If today's fetch fails, try yesterday
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        text = await fetchAndParsePDF(yesterday);
       }
-      const arrayBuffer = await response.arrayBuffer();
-      const pdfData = await pdf(Buffer.from(arrayBuffer));
-      const text = pdfData.text;
 
       // Parse structured data from the extracted text
       type CommodityItem = { specification: string; price: number | null };
