@@ -60,5 +60,8 @@ export async function GET() {
   }
 
   const structuredData = parseCommodityData(text);
-  return NextResponse.json({ data: structuredData });
+  const filteredData = structuredData.filter(
+    (commodity) => commodity.items.length > 0
+  );
+  return NextResponse.json({ data: filteredData });
 }
