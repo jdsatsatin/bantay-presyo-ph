@@ -1,12 +1,40 @@
 import { pdf } from "pdf-parse";
 
+function getMonthName(month: number) {
+  return [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ][month - 1];
+}
+
 export const priceService = {
   getPrices: async () => {
     try {
-      // Fetch and parse PDF directly
-      const response = await fetch(
-        "https://www.da.gov.ph/wp-content/uploads/2025/10/Daily-Price-Index-October-6-2025.pdf"
-      );
+      // Always use today's date
+      const targetDate = new Date();
+      const year = targetDate.getFullYear();
+      const month = targetDate.getMonth() + 1; // JS months are 0-based
+      const day = targetDate.getDate();
+
+      // Format month and day as two digits
+      const monthStr = month.toString().padStart(2, "0");
+      const dayStr = day.toString().padStart(2, "0");
+      const monthName = getMonthName(month);
+
+      // Build PDF URL
+      const pdfUrl = `https://www.da.gov.ph/wp-content/uploads/${year}/${monthStr}/Daily-Price-Index-${monthName}-${day}-${year}.pdf`;
+
+      const response = await fetch(pdfUrl);
       if (!response.ok) {
         throw new Error("Failed to fetch the PDF file.");
       }
