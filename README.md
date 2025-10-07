@@ -1,7 +1,3 @@
-Here’s a clean and professional **README.md** you can use for your GitHub repository:
-
----
-
 # Bantay Presyo PH
 
 **Bantay Presyo PH** is a web application built with **Next.js** that helps users check and track daily market prices of essential goods around **Metro Manila (NCR)**.
