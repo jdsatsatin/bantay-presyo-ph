@@ -22,8 +22,8 @@ export async function GET() {
     const lines = text.split(/\r?\n/);
     const commodities: Commodity[] = [];
     let currentCommodity: Commodity | null = null;
-    let commodityRegex = /^[A-Z][A-Z\s\-\/]+$/;
-    let itemRegex = /^(.+?)\s+(\d+(?:\.\d+)?|n\/a)$/;
+    const commodityRegex = /^[A-Z][A-Z\s\-\/]+$/;
+    const itemRegex = /^(.+?)\s+(\d+(?:\.\d+)?|n\/a)$/;
     const unwantedCommodities = [
       "DAILY PRICE INDEX",
       "PREVAILING",
